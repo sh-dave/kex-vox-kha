@@ -175,7 +175,7 @@ class VoxelTools {
 	}
 
 	// TODO (DK) cleanup the string lookup mess
-	public static function newVoxelMesh( voxels: Array<Voxel> ) : Model {
+	public static function newVoxelMesh( voxels: Array<Voxel> ) : Array<Triangle> {
 		var lookup = new Map<String, Bool>();
 
 		for (v in voxels) {
@@ -244,9 +244,10 @@ class VoxelTools {
 			triangles = triangles.concat(triangulateVoxelFaces(plane, faces));
 		}
 
-		return {
-			mesh: triangles,
-			position: new Vector3(),
-		}
+		return triangles;
+		// return {
+		// 	mesh: triangles,
+		// 	position: new Vector3(),
+		// }
 	}
 }
