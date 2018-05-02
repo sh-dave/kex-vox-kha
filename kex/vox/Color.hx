@@ -2,11 +2,11 @@ package kex.vox;
 
 @:structInit
 class Color {
-	public var r: Float;
-	public var g: Float;
-	public var b: Float;
-	public var a: Float;
+	public var r: Int;//Float;
+	public var g: Int;//Float;
+	public var b: Int;//Float;
+	public var a: Int;//Float;
 
-	public function toString() : String
+	@:keep public function toString() : String
 		return '$r/$g/$b/$a';
 }
