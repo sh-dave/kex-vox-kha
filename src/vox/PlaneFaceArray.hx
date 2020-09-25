@@ -1,3 +1,3 @@
-package kex.vox;
+package vox;
 
 typedef PlaneFaceArray = Array<PlaneFace>;

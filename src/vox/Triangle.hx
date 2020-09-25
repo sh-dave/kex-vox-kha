@@ -1,13 +1,13 @@
-package kex.vox;
+package vox;
 
 import kha.math.Vector3;
 
-using kex.Vector3Tools;
+using KhaVector3Ext;
 
 class Triangle {
-	public var v1: Vertex;
-	public var v2: Vertex;
-	public var v3: Vertex;
+	public final v1: Vertex;
+	public final v2: Vertex;
+	public final v3: Vertex;
 
 	public function new( p1: Vector3, p2: Vector3, p3: Vector3 ) {
 		v1 = new Vertex(p1);

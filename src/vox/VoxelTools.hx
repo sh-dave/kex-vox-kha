@@ -1,8 +1,8 @@
-package kex.vox;
+package vox;
 
 import kha.math.Vector3;
 
-using kex.Vector3Tools;
+using KhaVector3Ext;
 
 class VoxelTools {
 	public static function combineVoxelFaces( faces: Array<VoxelFace> ) : Array<VoxelFace> {
@@ -30,11 +30,11 @@ class VoxelTools {
 			}
 		}
 
-		var nj = j1 - j0 + 1;
-		var ni = i1 - i0 + 1;
-		var a: Array<Array<Int>> = [for (j in 0...nj) [for (i in 0...ni) 0]];
-		var w: Array<Array<Int>> = [for (j in 0...nj) [for (i in 0...ni) 0]];
-		var h: Array<Array<Int>> = [for (j in 0...nj) [for (i in 0...ni) 0]];
+		final nj = j1 - j0 + 1;
+		final ni = i1 - i0 + 1;
+		final a = [for (j in 0...nj) [for (i in 0...ni) 0]];
+		final w = [for (j in 0...nj) [for (i in 0...ni) 0]];
+		final h = [for (j in 0...nj) [for (i in 0...ni) 0]];
 
 		var count = 0;
 
@@ -47,10 +47,10 @@ class VoxelTools {
 			}
 		}
 
-		var result: Array<VoxelFace> = [];
+		final result: Array<VoxelFace> = [];
 
 		while (count > 0) {
-			var maxArea: Int = 0;
+			var maxArea = 0;
 			var maxFace: VoxelFace = null;
 
 			for (j in 0...nj) {
@@ -117,22 +117,22 @@ class VoxelTools {
 		return result;
 	}
 
-	public static function triangulateVoxelFaces( plane: VoxelPlane, faces: Array<VoxelFace> ) : Array<Triangle> {
-		var triangles: Array<Triangle> = [];
+	public static function triangulateVoxelFaces( plane: VoxelPlane, faces: Array<VoxelFace> ) : Array<Null<Triangle>> {
+		final triangles: Array<Triangle> = [];
 		triangles[faces.length * 2 - 1] = null;
 		var k = plane.position + plane.normal.sign * 0.5;
 
-		var p1 = new Vector3();
-		var p2 = new Vector3();
-		var p3 = new Vector3();
-		var p4 = new Vector3();
+		final p1 = new Vector3();
+		final p2 = new Vector3();
+		final p3 = new Vector3();
+		final p4 = new Vector3();
 
 		for (i in 0...faces.length) {
-			var face = faces[i];
-			var i0 = face.i0 - 0.5;
-			var j0 = face.j0 - 0.5;
-			var i1 = face.i1 + 0.5;
-			var j1 = face.j1 + 0.5;
+			final face = faces[i];
+			final i0 = face.i0 - 0.5;
+			final j0 = face.j0 - 0.5;
+			final i1 = face.i1 + 0.5;
+			final j1 = face.j1 + 0.5;
 
 			switch plane.normal.axis {
 				case VoxelX:
@@ -140,11 +140,13 @@ class VoxelTools {
 					p2.setFrom(new Vector3(k, i1, j0));
 					p3.setFrom(new Vector3(k, i1, j1));
 					p4.setFrom(new Vector3(k, i0, j1));
+
 				case VoxelY:
 					p1.setFrom(new Vector3(i0, k, j1));
 					p2.setFrom(new Vector3(i1, k, j1));
 					p3.setFrom(new Vector3(i1, k, j0));
 					p4.setFrom(new Vector3(i0, k, j0));
+
 				case VoxelZ:
 					p1.setFrom(new Vector3(i0, j0, k));
 					p2.setFrom(new Vector3(i1, j0, k));
@@ -157,8 +159,8 @@ class VoxelTools {
 				p2.swap(p3);
 			}
 
-			var t1 = new Triangle(p1, p2, p3);
-			var t2 = new Triangle(p1, p3, p4);
+			final t1 = new Triangle(p1, p2, p3);
+			final t2 = new Triangle(p1, p3, p4);
 			t1.fixNormals();
 			t2.fixNormals();
 			t1.v1.color = plane.color;
@@ -176,16 +178,16 @@ class VoxelTools {
 
 	// TODO (DK) cleanup the string lookup mess
 	public static function newVoxelMesh( voxels: Array<Voxel> ) : Array<Triangle> {
-		var lookup = new Map<String, Bool>();
+		final lookup = new Map<String, Bool>();
 
 		for (v in voxels) {
 			lookup.set('${v.x}/${v.y}/${v.z}', true);
 		}
 
-		var planeFaces: PlaneFaceArray = [];
+		final planeFaces: PlaneFaceArray = [];
 
 		function append( pf: PlaneFaceArray, plane: VoxelPlane, face: VoxelFace ) {
-			var key = plane.toString();
+			final key = plane.toString();
 			var entry = Lambda.find(pf, function( e ) return e.key == key);
 
 			if (entry == null) {
@@ -200,54 +202,50 @@ class VoxelTools {
 
 		for (v in voxels) {
 			if (!lookup.get('${v.x + 1}/${v.y}/${v.z}')) {
-				var plane: VoxelPlane = { normal: Const.VoxelPosX, position: v.x, color: v.color }
-				var face: VoxelFace = { i0: v.y, j0: v.z, i1: v.y, j1: v.z }
+				final plane: VoxelPlane = { normal: Const.VoxelPosX, position: v.x, color: v.color }
+				final face: VoxelFace = { i0: v.y, j0: v.z, i1: v.y, j1: v.z }
 				planeFaces = append(planeFaces, plane, face);
 			}
 
 			if (!lookup.get('${v.x - 1}/${v.y}/${v.z}')) {
-				var plane: VoxelPlane = { normal: Const.VoxelNegX, position: v.x, color: v.color }
-				var face: VoxelFace = { i0: v.y, j0: v.z, i1: v.y, j1: v.z }
+				final plane: VoxelPlane = { normal: Const.VoxelNegX, position: v.x, color: v.color }
+				final face: VoxelFace = { i0: v.y, j0: v.z, i1: v.y, j1: v.z }
 				planeFaces = append(planeFaces, plane, face);
 			}
 
 			if (!lookup.get('${v.x}/${v.y + 1}/${v.z}')) {
-				var plane: VoxelPlane = { normal: Const.VoxelPosY, position: v.y, color: v.color }
-				var face: VoxelFace = { i0: v.x, j0: v.z, i1: v.x, j1: v.z }
+				final plane: VoxelPlane = { normal: Const.VoxelPosY, position: v.y, color: v.color }
+				final face: VoxelFace = { i0: v.x, j0: v.z, i1: v.x, j1: v.z }
 				planeFaces = append(planeFaces, plane, face);
 			}
 
 			if (!lookup.get('${v.x}/${v.y - 1}/${v.z}')) {
-				var plane: VoxelPlane = { normal: Const.VoxelNegY, position: v.y, color: v.color }
-				var face: VoxelFace = { i0: v.x, j0: v.z, i1: v.x, j1: v.z }
+				final plane: VoxelPlane = { normal: Const.VoxelNegY, position: v.y, color: v.color }
+				final face: VoxelFace = { i0: v.x, j0: v.z, i1: v.x, j1: v.z }
 				planeFaces = append(planeFaces, plane, face);
 			}
 
 			if (!lookup.get('${v.x}/${v.y}/${v.z + 1}')) {
-				var plane: VoxelPlane = { normal: Const.VoxelPosZ, position: v.z, color: v.color }
-				var face: VoxelFace = { i0: v.x, j0: v.y, i1: v.x, j1: v.y }
+				final plane: VoxelPlane = { normal: Const.VoxelPosZ, position: v.z, color: v.color }
+				final face: VoxelFace = { i0: v.x, j0: v.y, i1: v.x, j1: v.y }
 				planeFaces = append(planeFaces, plane, face);
 			}
 
 			if (!lookup.get('${v.x}/${v.y}/${v.z - 1}')) {
-				var plane: VoxelPlane = { normal: Const.VoxelNegZ, position: v.z, color: v.color }
-				var face: VoxelFace = { i0: v.x, j0: v.y, i1: v.x, j1: v.y }
+				final plane: VoxelPlane = { normal: Const.VoxelNegZ, position: v.z, color: v.color }
+				final face: VoxelFace = { i0: v.x, j0: v.y, i1: v.x, j1: v.y }
 				planeFaces = append(planeFaces, plane, face);
 			}
 		}
 
-		var triangles: Array<Triangle> = [];
+		final triangles: Array<Triangle> = [];
 
 		for (entry in planeFaces) {
-			var plane = entry.plane;
-			var faces = combineVoxelFaces(entry.faces);
+			final plane = entry.plane;
+			final faces = combineVoxelFaces(entry.faces);
 			triangles = triangles.concat(triangulateVoxelFaces(plane, faces));
 		}
 
 		return triangles;
-		// return {
-		// 	mesh: triangles,
-		// 	position: new Vector3(),
-		// }
 	}
 }
